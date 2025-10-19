@@ -49,12 +49,10 @@ java -cp PageSimulator.jar Main
 ```
 PageSimulator/
 ├─ src/
-│  ├─ core/
+│  ├─ core/            # algoritmos
 │  │  ├─ FIFO.java
-│  │  ├─ LRU.java
-│  │  ├─ MemoryState.java
-│  │  └─ PageReplace.java
-│  ├─ ui/
+│  │  └─ LRU.java
+│  ├─ ui/              # interface gráfica
 │  │  └─ MainFrame.java
 │  └─ Main.java
 └─ out/               # diretório de build usado nos exemplos de compilação 🏗️

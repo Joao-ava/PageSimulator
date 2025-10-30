@@ -29,6 +29,7 @@ public class NFU {
 
             boolean isMemoryFull = this.counter.size() == this.partitions;
             if (!isMemoryFull) {
+                faults++;
                 this.counter.put(page, 1);
                 this.memoryList.add(MemoryState.fromIterator(this.counter.values().iterator(), page, -1, true));
                 continue;

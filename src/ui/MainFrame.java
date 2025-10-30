@@ -130,7 +130,8 @@ public class MainFrame extends JFrame {
             StringBuilder sb = new StringBuilder();
             sb.append("LRU: ").append(lruFaults).append(" faltas encontradas\n");
             sb.append("FIFO: ").append(fifoFaults).append(" faltas encontradas\n");
-            sb.append("NFU: ").append(nfuFaults).append(" faltas encontradas");
+            sb.append("NFU: ").append(nfuFaults).append(" faltas encontradas\n");
+            sb.append("Clock: ").append(0).append(" faltas encontradas");
             resultPanel.setResult(sb.toString());
 
             // Atualiza/Cria o modelo da tabela conforme o número de partições
@@ -142,21 +143,6 @@ public class MainFrame extends JFrame {
             ex.printStackTrace();
             showError("Erro ao processar: " + ex.getMessage());
         }
-    }
-
-    private String makeProcessResult(int[] pages, int partitions) {
-        StringBuilder sb = new StringBuilder();
-        // LRU
-        sb.append("LRU: ");
-        LRU lru = new LRU(pages, partitions);
-        sb.append(lru.execute()).append(" faltas encontradas");
-        sb.append("\n");
-        // FIFO
-        sb.append("FIFO: ");
-        FIFO fifo = new FIFO(pages, partitions);
-        sb.append(fifo.execute()).append(" faltas encontradas");
-
-        return sb.toString();
     }
 
     private void showError(String msg) {

@@ -1,16 +1,19 @@
 package core;
 
 import java.util.LinkedList;
+import java.util.List;
 
 public class LRU {
     private int[] pages;
     private int partitions;
     private final LinkedList<Integer> usages;
+    private final List<MemoryState> memoryList;
 
     public LRU(int[] pages, int partitions) {
         this.pages = pages;
         this.partitions = partitions;
         this.usages = new LinkedList<>();
+        this.memoryList = new LinkedList<>();
     }
 
     public int execute() {
@@ -19,11 +22,13 @@ public class LRU {
             int index = this.usages.indexOf(page);
             if (index != -1 || !this.isMemoryFull()) {
                 this.registerUse(page, index);
+                this.memoryList.add(new MemoryState(usages, page));
                 continue;
             }
-            this.usages.removeLast();
+            int out = this.usages.removeLast();
             faults++;
             this.registerUse(page, -1);
+            this.memoryList.add(new MemoryState(usages, page, out));
         }
         return faults;
     }
@@ -38,5 +43,9 @@ public class LRU {
             this.usages.remove(index);
         }
         this.usages.addFirst(page);
+    }
+
+    public List<MemoryState> getMemoryList() {
+        return this.memoryList;
     }
 }

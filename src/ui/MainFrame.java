@@ -2,22 +2,31 @@ package ui;
 
 import core.FIFO;
 import core.LRU;
+import core.MemoryState;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
 
 public class MainFrame extends JFrame {
     private final JSpinner partitionsSpinner;
     private final JTextField pagesField;
     private final JTextArea resultArea;
+    private final JTable table;
+    private MemoryStateTableModel tableModel;
+    private Map<String, List<MemoryState>> memoryStates;
 
     public MainFrame() {
         super("Simulador de algoritmos de substituição de páginas");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(520, 320);
+        setSize(900, 600);
         setLocationRelativeTo(null);
+
+        // map com MemoryState
+        memoryStates = new HashMap<>();
+        memoryStates.put("LRU", new ArrayList<>());
+        memoryStates.put("FIFO", new ArrayList<>());
 
         partitionsSpinner = new JSpinner(new SpinnerNumberModel(5, 1, Integer.MAX_VALUE, 1));
         pagesField = new JTextField("1 2 3 4 5 6 5 4 3 2 1");
@@ -25,6 +34,11 @@ public class MainFrame extends JFrame {
         resultArea.setEditable(false);
         resultArea.setLineWrap(true);
         resultArea.setWrapStyleWord(true);
+
+        // Tabela de passos
+        tableModel = new MemoryStateTableModel(((Number) partitionsSpinner.getValue()).intValue());
+        table = new JTable(tableModel);
+        table.setFillsViewportHeight(true);
 
         JPanel form = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -57,7 +71,10 @@ public class MainFrame extends JFrame {
 
         JPanel resultPanel = new JPanel(new BorderLayout());
         resultPanel.setBorder(BorderFactory.createTitledBorder("Resultado"));
-        resultPanel.add(new JScrollPane(resultArea), BorderLayout.CENTER);
+
+        JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(resultArea), new JScrollPane(table));
+        split.setResizeWeight(0.3);
+        resultPanel.add(split, BorderLayout.CENTER);
 
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(form, BorderLayout.NORTH);
@@ -74,6 +91,10 @@ public class MainFrame extends JFrame {
 
         // Limpa o resultado anterior para evitar confusão
         resultArea.setText("");
+        // Limpa tabela
+        if (tableModel != null) {
+            tableModel.setRows(Collections.emptyList());
+        }
     }
 
     private void onProcess() {
@@ -105,7 +126,23 @@ public class MainFrame extends JFrame {
                 pages[i] = list.get(i);
             }
 
-            resultArea.setText(makeProcessResult(pages, partitions));
+            // Executa LRU e coleta estados para a tabela
+            LRU lru = new LRU(pages, partitions);
+            int lruFaults = lru.execute();
+
+            // Atualiza/Cria o modelo da tabela conforme o número de partições
+            tableModel = new MemoryStateTableModel(partitions);
+            table.setModel(tableModel);
+            tableModel.setRows(lru.getMemoryList());
+
+            // Calcula também o FIFO (placeholder atual)
+            FIFO fifo = new FIFO(pages, partitions);
+            int fifoFaults = fifo.execute();
+
+            StringBuilder sb = new StringBuilder();
+            sb.append("LRU: ").append(lruFaults).append(" faltas encontradas\n");
+            sb.append("FIFO: ").append(fifoFaults).append(" faltas encontradas");
+            resultArea.setText(sb.toString());
         } catch (NumberFormatException ex) {
             showError("Use apenas números inteiros separados por espaço na ordem das páginas.");
         } catch (Exception ex) {

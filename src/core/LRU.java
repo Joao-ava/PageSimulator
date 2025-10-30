@@ -22,13 +22,17 @@ public class LRU {
             int index = this.usages.indexOf(page);
             if (index != -1 || !this.isMemoryFull()) {
                 this.registerUse(page, index);
-                this.memoryList.add(new MemoryState(usages, page));
+                boolean isFault = index == -1;
+                if (isFault) {
+                    faults++;
+                }
+                this.memoryList.add(MemoryState.fromIterator(usages.iterator(), page, -1, isFault));
                 continue;
             }
             int out = this.usages.removeLast();
             faults++;
             this.registerUse(page, -1);
-            this.memoryList.add(new MemoryState(usages, page, out));
+            this.memoryList.add(MemoryState.fromIterator(usages.iterator(), page, out, true));
         }
         return faults;
     }

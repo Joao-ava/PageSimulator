@@ -121,6 +121,7 @@ public class MainFrame extends JFrame {
             // Calcula também o FIFO (placeholder atual)
             FIFO fifo = new FIFO(pages, partitions);
             int fifoFaults = fifo.execute();
+            this.memoryStates.put("FIFO", fifo.getMemoryList());
 
             // Executa NFU
             NFU nfu = new NFU(pages, partitions);

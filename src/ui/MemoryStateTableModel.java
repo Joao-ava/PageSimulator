@@ -9,6 +9,7 @@ import java.util.List;
 public class MemoryStateTableModel extends AbstractTableModel {
     private final int partitions;
     private final List<MemoryState> rows;
+    private final int fixedColumns = 4;
 
     public MemoryStateTableModel(int partitions) {
         this.partitions = Math.max(1, partitions);
@@ -30,7 +31,7 @@ public class MemoryStateTableModel extends AbstractTableModel {
 
     @Override
     public int getColumnCount() {
-        return 3 + partitions;
+        return fixedColumns + partitions;
     }
 
     @Override
@@ -38,7 +39,8 @@ public class MemoryStateTableModel extends AbstractTableModel {
         if (column == 0) return "Passo";
         if (column == 1) return "Atual";
         if (column == 2) return "Saiu";
-        int memIdx = column - 3;
+        if (column == 3) return "Falta";
+        int memIdx = column - fixedColumns;
         return "Mem[" + memIdx + "]";
     }
 
@@ -56,7 +58,10 @@ public class MemoryStateTableModel extends AbstractTableModel {
         if (columnIndex == 2) {
             return state.outPage == -1 ? "" : state.outPage;
         }
-        int memIdx = columnIndex - 3;
+        if (columnIndex == 3) {
+            return state.isFault ? "Sim" : "";
+        }
+        int memIdx = columnIndex - fixedColumns;
         if (state.pages != null && memIdx < state.pages.size()) {
             return state.pages.get(memIdx);
         }

@@ -1,9 +1,6 @@
 package ui;
 
-import core.FIFO;
-import core.LRU;
-import core.MemoryState;
-import core.NFU;
+import core.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -128,11 +125,16 @@ public class MainFrame extends JFrame {
             int nfuFaults = nfu.execute();
             this.memoryStates.put("NFU", nfu.getMemoryList());
 
+            // Clock
+            Clock clock = new Clock(pages, partitions);
+            int clockFaults = clock.execute();
+            this.memoryStates.put("Clock", clock.getMemoryList());
+
             StringBuilder sb = new StringBuilder();
             sb.append("LRU: ").append(lruFaults).append(" faltas encontradas\n");
             sb.append("FIFO: ").append(fifoFaults).append(" faltas encontradas\n");
             sb.append("NFU: ").append(nfuFaults).append(" faltas encontradas\n");
-            sb.append("Clock: ").append(0).append(" faltas encontradas");
+            sb.append("Clock: ").append(clockFaults).append(" faltas encontradas");
             resultPanel.setResult(sb.toString());
 
             // Atualiza/Cria o modelo da tabela conforme o número de partições

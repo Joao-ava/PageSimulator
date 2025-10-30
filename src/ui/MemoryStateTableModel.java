@@ -63,7 +63,8 @@ public class MemoryStateTableModel extends AbstractTableModel {
         }
         int memIdx = columnIndex - fixedColumns;
         if (state.pages != null && memIdx < state.pages.size()) {
-            return state.pages.get(memIdx);
+            int value = state.pages.get(memIdx);
+            return value == -1 ? "" : value;
         }
         return "";
     }

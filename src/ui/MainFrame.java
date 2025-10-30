@@ -3,6 +3,7 @@ package ui;
 import core.FIFO;
 import core.LRU;
 import core.MemoryState;
+import core.NFU;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,8 +14,7 @@ public class MainFrame extends JFrame {
     private final JSpinner partitionsSpinner;
     private final JTextField pagesField;
     private final JTextArea resultArea;
-    private final JTable table;
-    private MemoryStateTableModel tableModel;
+    private final ResultPanel resultPanel;
     private Map<String, List<MemoryState>> memoryStates;
 
     public MainFrame() {
@@ -27,6 +27,7 @@ public class MainFrame extends JFrame {
         memoryStates = new HashMap<>();
         memoryStates.put("LRU", new ArrayList<>());
         memoryStates.put("FIFO", new ArrayList<>());
+        memoryStates.put("NFU", new ArrayList<>());
 
         partitionsSpinner = new JSpinner(new SpinnerNumberModel(5, 1, Integer.MAX_VALUE, 1));
         pagesField = new JTextField("1 2 3 4 5 6 5 4 3 2 1");
@@ -34,11 +35,6 @@ public class MainFrame extends JFrame {
         resultArea.setEditable(false);
         resultArea.setLineWrap(true);
         resultArea.setWrapStyleWord(true);
-
-        // Tabela de passos
-        tableModel = new MemoryStateTableModel(((Number) partitionsSpinner.getValue()).intValue());
-        table = new JTable(tableModel);
-        table.setFillsViewportHeight(true);
 
         JPanel form = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -69,12 +65,7 @@ public class MainFrame extends JFrame {
         processButton.addActionListener(e -> onProcess());
         form.add(processButton, gbc);
 
-        JPanel resultPanel = new JPanel(new BorderLayout());
-        resultPanel.setBorder(BorderFactory.createTitledBorder("Resultado"));
-
-        JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(resultArea), new JScrollPane(table));
-        split.setResizeWeight(0.3);
-        resultPanel.add(split, BorderLayout.CENTER);
+        resultPanel = new ResultPanel(((Number) partitionsSpinner.getValue()).intValue(), memoryStates);
 
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(form, BorderLayout.NORTH);
@@ -90,11 +81,7 @@ public class MainFrame extends JFrame {
         pagesField.setText(example);
 
         // Limpa o resultado anterior para evitar confusão
-        resultArea.setText("");
-        // Limpa tabela
-        if (tableModel != null) {
-            tableModel.setRows(Collections.emptyList());
-        }
+        resultPanel.clearResult();
     }
 
     private void onProcess() {
@@ -129,23 +116,30 @@ public class MainFrame extends JFrame {
             // Executa LRU e coleta estados para a tabela
             LRU lru = new LRU(pages, partitions);
             int lruFaults = lru.execute();
-
-            // Atualiza/Cria o modelo da tabela conforme o número de partições
-            tableModel = new MemoryStateTableModel(partitions);
-            table.setModel(tableModel);
-            tableModel.setRows(lru.getMemoryList());
+            this.memoryStates.put("LRU", lru.getMemoryList());
 
             // Calcula também o FIFO (placeholder atual)
             FIFO fifo = new FIFO(pages, partitions);
             int fifoFaults = fifo.execute();
 
+            // Executa NFU
+            NFU nfu = new NFU(pages, partitions);
+            int nfuFaults = nfu.execute();
+            this.memoryStates.put("NFU", nfu.getMemoryList());
+
             StringBuilder sb = new StringBuilder();
             sb.append("LRU: ").append(lruFaults).append(" faltas encontradas\n");
-            sb.append("FIFO: ").append(fifoFaults).append(" faltas encontradas");
-            resultArea.setText(sb.toString());
+            sb.append("FIFO: ").append(fifoFaults).append(" faltas encontradas\n");
+            sb.append("NFU: ").append(nfuFaults).append(" faltas encontradas");
+            resultPanel.setResult(sb.toString());
+
+            // Atualiza/Cria o modelo da tabela conforme o número de partições
+            resultPanel.updateTableModel(partitions);
         } catch (NumberFormatException ex) {
             showError("Use apenas números inteiros separados por espaço na ordem das páginas.");
         } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            ex.printStackTrace();
             showError("Erro ao processar: " + ex.getMessage());
         }
     }

@@ -2,6 +2,20 @@
 
 Simulador (GUI) de algoritmos de substituição de páginas em Java. O objetivo é comparar a quantidade de faltas de página em diferentes cenários de memória virtual. 💻
 
+## Como utilizar
+
+![Tela principal](./assets/main-screen.png)
+
+Ao informar os dados necessarios pressione o botão "**Processar**" e veja os resultados.
+
+### Dados de entrada
+- **Tamanho das partições**: Informa quantas partições a mémoria tem, ou seja a quantidade de páginas que podem ficar na mémoria aos mesmo tempo.
+- **Ordem das páginas**: As páginas que vão passar pela mémoria separadas por espaço.
+
+### Dados de saída
+- Uma caixa de texto com a quantidade por método.
+- Uma tabela de como estava o estado da mémoria passo a passo.
+
 ## Requisitos ✅
 - ☕ Java 8+ (recomendado Java 11 ou superior)
 - 🧰 Opcional: IntelliJ IDEA (ou outra IDE Java)

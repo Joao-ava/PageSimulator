@@ -31,7 +31,7 @@ O Clock e o NFU mostraram-se bons compromissos entre eficiência e simplicidade 
 
 O projeto PageSimulator pode ser executado de duas formas. A primeira é pela IDE IntelliJ IDEA: abra a pasta do projeto, certifique-se de que a pasta src está marcada como Source Root (geralmente é automático), abra o arquivo src/Main.java e execute a classe Main por meio do menu Run > Run 'Main'. Ao fazer isso, a interface gráfica desenvolvida com Swing será exibida automaticamente.
 
-A segunda forma é pelo terminal. Estando na raiz do projeto (PageSimulator), compile os arquivos com o comando **javac -d out src/core/*.java src/ui/*.java src/Main.java** e execute o programa com **java -cp out Main**. Se desejar gerar um arquivo JAR simples, utilize **jar --create --file PageSimulator.jar -C out**. e, para executá-lo, digite **java -cp PageSimulator.jar Main**.
+A segunda forma é pelo terminal. Estando na raiz do projeto (PageSimulator), compile os arquivos com o comando **javac -d out src/core/\*.java src/ui/\*.java src/Main.java** e execute o programa com **java -cp out Main**. Se desejar gerar um arquivo JAR simples, utilize **jar --create --file PageSimulator.jar -C out**. e, para executá-lo, digite **java -cp PageSimulator.jar Main**.
 
 ## Conclusão
 
